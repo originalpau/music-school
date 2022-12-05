@@ -102,6 +102,29 @@ VALUES
     ((SELECT id FROM instructor WHERE person_number='198805031623'), 'TBD', 'intermediate', '2022-11-10 13:30', 10, 3, 'rock'),
     ((SELECT id FROM instructor WHERE person_number='197012042632'), 'TBD', 'advanced', '2022-11-12 13:30', 10, 3, 'jazz');
 
+INSERT INTO ensembles (instructor_id,classroom,level,start_time,maximum_student,minimum_student,genre)
+VALUES
+  (3,'TBD','intermediate','2023-01-13 20:17',15,4,'gospel'),
+  (2,'TBD','intermediate','2023-01-22 07:44',10,4,'rock'),
+  (1,'TBD','intermediate','2022-12-14 08:47',11,4,'gospel'),
+  (3,'TBD','beginner','2023-01-25 18:08',14,4,'jazz'),
+  (4,'TBD','beginner','2023-01-16 23:11',11,3,'gospel'),
+  (2,'TBD','intermediate','2023-01-05 22:26',12,4,'jazz'),
+  (2,'TBD','intermediate','2022-12-06 11:06',11,3,'gospel'),
+  (4,'TBD','intermediate','2022-12-23 20:41',12,4,'rock'),
+  (0,'TBD','intermediate','2022-12-30 06:26',13,4,'jazz'),
+  (2,'TBD','beginner','2022-12-12 05:49',11,3,'pop'),
+  (2,'TBD','intermediate','2022-12-09 05:52',11,3,'jazz'),
+  (2,'TBD','intermediate','2023-01-31 04:31',15,3,'jazz'),
+  (1,'TBD','intermediate','2023-01-10 19:15',14,3,'pop'),
+  (3,'TBD','beginner','2023-01-17 02:18',11,4,'rock'),
+  (2,'TBD','beginner','2022-12-13 16:59',15,4,'rock'),
+  (4,'TBD','beginner','2022-12-05 21:22',14,3,'rock'),
+  (2,'TBD','intermediate','2023-01-29 02:38',13,3,'jazz'),
+  (5,'TBD','beginner','2022-12-03 11:25',14,3,'jazz'),
+  (4,'TBD','beginner','2023-01-11 02:30',15,3,'gospel'),
+  (2,'TBD','intermediate','2022-12-26 09:31',11,4,'rock');
+  
 INSERT INTO
 student_ensembles(student_id, ensembles_id, ensemble_instrument)
 VALUES
@@ -111,6 +134,24 @@ VALUES
     ((SELECT id FROM student WHERE person_number='199906209876'), (SELECT id FROM ensembles WHERE start_time='2022-11-8 15:00'), 'guitar'),
     ((SELECT id FROM student WHERE person_number='200003021463'), (SELECT id FROM ensembles WHERE start_time='2022-11-10 13:30'), 'guitar'),
     ((SELECT id FROM student WHERE person_number='200101015214'), (SELECT id FROM ensembles WHERE start_time='2022-11-12 13:30'), 'piano');
+
+INSERT INTO
+student_ensembles(student_id, ensembles_id, ensemble_instrument)
+VALUES
+(1, 9, 'piano'),
+(1, 16, 'guitar'),
+(1, 21, 'drums'),
+(2, 9, 'guitar'),
+(2, 16, 'guitar'),
+(2, 21, 'guitar'),
+(3, 9, 'piano'),
+(3, 16, 'piano'),
+(4, 9, 'drums'),
+(4, 16, 'drums'),
+(4, 21, 'drums'),
+(5, 9, 'violin'),
+(5,16, 'violin'),
+(6, 9, 'piano');
 
 -- group_lesson
 INSERT INTO
@@ -138,3 +179,7 @@ VALUES
     ((SELECT id FROM instructor WHERE person_number='197202051521'), (SELECT id FROM student WHERE person_number='200101015214'), '2022-8-1 15:00', 'violin', 'TBD', 'beginner'),
     ((SELECT id FROM instructor WHERE person_number='197202051521'), (SELECT id FROM student WHERE person_number='200101015214'), '2022-8-7 15:00', 'violin', 'TBD', 'beginner'),
     ((SELECT id FROM instructor WHERE person_number='197202051521'), (SELECT id FROM student WHERE person_number='200101015214'), '2022-7-15 15:00', 'violin', 'TBD', 'beginner');
+
+update ensembles
+set maximum_student = 6, minimum_student = 3
+where date_trunc('week', start_time) = date_trunc('week', now()) + interval '1 week';

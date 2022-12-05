@@ -13,15 +13,15 @@ instructor_price SMALLINT NOT NULL
 
 -- instructor
 CREATE TABLE instructor (
-id SERIAL PRIMARY KEY, 
-person_number VARCHAR(12) UNIQUE NOT NULL, 
-first_name VARCHAR (50) NOT NULL, 
-last_name VARCHAR(500) NOT NULL, 
-phone_no VARCHAR(50) NOT NULL, 
-email VARCHAR(500) NOT NULL, 
-street VARCHAR(50) NOT NULL,
-zip VARCHAR(10) NOT NULL, 
-city VARCHAR(50) NOT NULL 
+    id SERIAL PRIMARY KEY,
+    person_number VARCHAR(12) UNIQUE NOT NULL, 
+    first_name VARCHAR (50) NOT NULL, 
+    last_name VARCHAR(500) NOT NULL, 
+    phone_no VARCHAR(50) NOT NULL, 
+    email VARCHAR(500) NOT NULL, 
+    street VARCHAR(50) NOT NULL,
+    zip VARCHAR(10) NOT NULL, 
+    city VARCHAR(50) NOT NULL 
 );
 
 -- instructor_availability
@@ -52,17 +52,18 @@ family_phone_num VARCHAR(50) NOT NULL
 
 --student
 CREATE TABLE student (
-id SERIAL PRIMARY KEY, 
-family_id INT NOT NULL, 
-person_number VARCHAR(12) UNIQUE NOT NULL, 
-first_name VARCHAR(50) NOT NULL, 
-last_name VARCHAR(500) NOT NULL, 
-phone_no VARCHAR(50) NOT NULL, 
-email VARCHAR(500) NOT NULL, 
-street VARCHAR(50) NOT NULL, 
-zip VARCHAR(10) NOT NULL,
-city VARCHAR(50) NOT NULL,
-FOREIGN KEY (family_id) REFERENCES family(id)
+    id SERIAL PRIMARY KEY,
+    person_number VARCHAR(12) UNIQUE NOT NULL, 
+    first_name VARCHAR (50) NOT NULL, 
+    last_name VARCHAR(500) NOT NULL, 
+    phone_no VARCHAR(50) NOT NULL, 
+    email VARCHAR(500) NOT NULL, 
+    street VARCHAR(50) NOT NULL,
+    zip VARCHAR(10) NOT NULL, 
+    city VARCHAR(50) NOT NULL,
+    family_id INT NOT NULL,
+
+    FOREIGN KEY (family_id) REFERENCES family(id)
 );
 
 -- rental_instrument
@@ -84,23 +85,39 @@ CREATE TABLE student_rental_instrument (
     FOREIGN KEY (student_id) REFERENCES student(id) ON DELETE CASCADE
 );
 
+--INHERITANCE: lesson
+CREATE TABLE lesson (
+    id SERIAL PRIMARY KEY, 
+    instructor_id INT NOT NULL,
+    classroom VARCHAR(50) NOT NULL, 
+    level level NOT NULL, 
+    start_time TIMESTAMP NOT NULL,
+    end_time TIMESTAMP,
+    FOREIGN KEY (instructor_id) REFERENCES instructor(id)
+);
+
+-- individual_lesson
+CREATE TABLE individual_lesson (
+    instrument VARCHAR(500) NOT NULL, 
+    student_id INT,
+
+    FOREIGN KEY (student_id) REFERENCES student(id),
+    CONSTRAINT individual_lesson_pkey PRIMARY KEY (id) 
+) INHERITS(lesson);
+
 -- group_lesson
 CREATE TABLE group_lesson (
-id SERIAL PRIMARY KEY, 
-instructor_id INT NOT NULL,
-classroom VARCHAR(50) NOT NULL, 
-level level NOT NULL, 
-start_time TIMESTAMP NOT NULL,
-end_time TIMESTAMP,
-instrument VARCHAR(500) NOT NULL, 
-maximum_student SMALLINT NOT NULL, 
-minimum_student SMALLINT NOT NULL CHECK(minimum_student > 2), 
-FOREIGN KEY (instructor_id) REFERENCES instructor(id)
-);
+    instrument VARCHAR(500) NOT NULL, 
+    maximum_student SMALLINT NOT NULL, 
+    minimum_student SMALLINT NOT NULL CHECK(minimum_student > 2),
+
+    CONSTRAINT group_lesson_pkey PRIMARY KEY (id)
+) INHERITS(lesson);
 
 CREATE TABLE student_group_lesson (
     student_id INT NOT NULL,
     group_lesson_id INT NOT NULL,
+
     PRIMARY KEY (student_id, group_lesson_id),
     FOREIGN KEY (student_id) REFERENCES student(id) ON DELETE CASCADE,
     FOREIGN KEY (group_lesson_id) REFERENCES group_lesson(id) ON DELETE CASCADE
@@ -108,37 +125,19 @@ CREATE TABLE student_group_lesson (
 
 -- ensembles
 CREATE TABLE ensembles (
-id SERIAL PRIMARY KEY,
-instructor_id INT NOT NULL,
-classroom VARCHAR(50) NOT NULL,
-level level NOT NULL, 
-genre VARCHAR(50) NOT NULL,
-start_time TIMESTAMP NOT NULL,
-end_time TIMESTAMP,
-maximum_student SMALLINT NOT NULL,
-minimum_student SMALLINT NOT NULL CHECK(minimum_student > 2),
-FOREIGN KEY (instructor_id) REFERENCES instructor(id)
-);
+    genre VARCHAR(50) NOT NULL,
+    maximum_student SMALLINT NOT NULL,
+    minimum_student SMALLINT NOT NULL CHECK(minimum_student > 2),
+
+    CONSTRAINT ensembles_pkey PRIMARY KEY (id)
+) INHERITS(lesson);
 
 CREATE TABLE student_ensembles (
     student_id INT NOT NULL,
     ensembles_id INT NOT NULL,
     ensemble_instrument VARCHAR(500) NOT NULL,
+
     PRIMARY KEY (student_id, ensembles_id),
     FOREIGN KEY (student_id) REFERENCES student(id) ON DELETE CASCADE,
     FOREIGN KEY (ensembles_id) REFERENCES ensembles(id) ON DELETE CASCADE
-);
-
--- individual_lesson
-CREATE TABLE individual_lesson (
-id SERIAL PRIMARY KEY, 
-instructor_id INT NOT NULL,
-classroom VARCHAR(50) NOT NULL, 
-level level NOT NULL, 
-start_time TIMESTAMP NOT NULL,
-end_time TIMESTAMP,
-instrument VARCHAR(500) NOT NULL, 
-student_id INT,
-FOREIGN KEY (instructor_id) REFERENCES instructor(id),
-FOREIGN KEY (student_id) REFERENCES student(id)
 );
