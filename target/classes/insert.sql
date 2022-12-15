@@ -32,9 +32,9 @@ VALUES
     ('piano', 'kawai', 120, true),
     ('drums', 'roland', 50, false);
 
--- student_rental_instrument
+-- rental
 INSERT INTO
-student_rental_instrument(rental_instrument_id, student_id, checkout_date)
+rental(rental_instrument_id, student_id, checkout_date)
 VALUES
     (8, (SELECT id FROM student WHERE person_number='199001011222'), '2022-11-01');
 

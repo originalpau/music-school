@@ -17,6 +17,8 @@ public class DAO {
     private PreparedStatement createRentalStmt;
     private PreparedStatement updateInstrumentStmt;
     private PreparedStatement updateRentalStmt;
+    private PreparedStatement updateInstrumentAfterRent;
+    private PreparedStatement updateInstrumentAfterTerminate;
 
     public DAO() throws SQLException {
         connectToDB();
@@ -106,16 +108,25 @@ public class DAO {
             if(updatedRows != 1) {
                 handleException(failureMsg, null);
             }
+        } catch (SQLException e) {
+            handleException(failureMsg, e);
+        }
+    }
 
-            updateInstrumentStmt.setBoolean(1, false);
-            updateInstrumentStmt.setInt(2, instrumentId);
-            updatedRows = updateInstrumentStmt.executeUpdate();
+    public void updateInstrumentStatus(boolean status) throws DAOException{
+        PreparedStatement stmtToExecute;
+        String failureMsg = "Could not update instrument status.";
 
-            if(updatedRows != 1) {
-                handleException(failureMsg, null);
-            }
+        if(status) {
+            stmtToExecute = updateInstrumentAfterTerminate;
+        } else {
+            stmtToExecute = updateInstrumentAfterRent;
+        }
 
+        try {
+            stmtToExecute.executeUpdate();
             connection.commit();
+
         } catch (SQLException e) {
             handleException(failureMsg, e);
         }
@@ -140,13 +151,12 @@ public class DAO {
         }
     }
 
-    public void updateRental(Integer instrId, Integer studentId) throws DAOException {
+    public void updateRental(Integer rentalId) throws DAOException {
         String failureMsg = "Could not update rental";
         int updatedRows = 0;
         try {
             updateRentalStmt.setTimestamp(1,Timestamp.valueOf(LocalDateTime.now()));
-            updateRentalStmt.setInt(2,instrId);
-            updateRentalStmt.setInt(3,studentId);
+            updateRentalStmt.setInt(2,rentalId);
             updatedRows = updateRentalStmt.executeUpdate();
 
             if(updatedRows != 1) {
@@ -158,7 +168,7 @@ public class DAO {
     }
 
     private void connectToDB() throws SQLException {
-        connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/bank",
+        connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/school",
                 "postgres", "postgres");
         connection.setAutoCommit(false);
     }
@@ -167,17 +177,27 @@ public class DAO {
         readInstrument = connection.prepareStatement("select * from rental_instrument where isAvailable=true and kind=?");
         readInstrumentByIdLock = connection.prepareStatement("select * from rental_instrument where id=? for update");
         readInstrumentById = connection.prepareStatement("select * from rental_instrument where id=?");
-        readStudentRentals = connection.prepareStatement("select count(*), student_id from student_rental_instrument r\n" +
+        readStudentRentals = connection.prepareStatement("select count(*), student_id from rental r\n" +
                 "inner join student on student.id = r.student_id\n" +
                 "where person_number = ? and return_date is null\n" +
                 "group by r.student_id");
-        createRentalStmt = connection.prepareStatement("insert into student_rental_instrument " +
+        createRentalStmt = connection.prepareStatement("insert into rental " +
                 "(rental_instrument_id, student_id, checkout_date) " +
                 "values (?, ?, ?)");
         updateInstrumentStmt = connection.prepareStatement("update rental_instrument set isAvailable=? where id = ?");
-        updateRentalStmt = connection.prepareStatement("update student_rental_instrument\n" +
+        updateRentalStmt = connection.prepareStatement("update rental\n" +
                 "set return_date = ?\n" +
-                "where rental_instrument_id = ? and student_id = ?");
+                "where id = ?");
+        updateInstrumentAfterRent = connection.prepareStatement("update rental_instrument t1\n" +
+                "set isAvailable = false\n" +
+                "from rental t2\n" +
+                "where t2.rental_instrument_id = t1.id\n" +
+                "and return_date is null");
+        updateInstrumentAfterTerminate = connection.prepareStatement("update rental_instrument t1\n" +
+                "set isAvailable = true\n" +
+                "from rental t2\n" +
+                "where t2.rental_instrument_id = t1.id\n" +
+                "and return_date is not null");
     }
 
     private void handleException(String failureMsg, Exception cause) throws DAOException {

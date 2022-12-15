@@ -75,13 +75,13 @@ CREATE TABLE rental_instrument (
     isAvailable BOOLEAN NOT NULL
 );
 
--- student_rental_instrument
-CREATE TABLE student_rental_instrument (
+-- rental
+CREATE TABLE rental (
+    id SERIAL PRIMARY KEY,
     rental_instrument_id INT NOT NULL,
     student_id INT NOT NULL,
     checkout_date TIMESTAMP NOT NULL,
     return_date TIMESTAMP,
-    PRIMARY KEY (rental_instrument_id, student_id),
     FOREIGN KEY (rental_instrument_id) REFERENCES rental_instrument(id) ON DELETE CASCADE,
     FOREIGN KEY (student_id) REFERENCES student(id) ON DELETE CASCADE
 );

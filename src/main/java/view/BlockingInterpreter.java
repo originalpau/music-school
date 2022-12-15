@@ -65,7 +65,7 @@ public class BlockingInterpreter {
                         ctrl.rent(Integer.parseInt(cmdLine.getParameter(0)), cmdLine.getParameter(1));
                         break;
                     case TERMINATE:
-                        ctrl.terminateRental(Integer.parseInt(cmdLine.getParameter(0)), cmdLine.getParameter(1));
+                        ctrl.terminateRental(Integer.parseInt(cmdLine.getParameter(0)));
                         break;
                     default:
                         System.out.println("illegal command");

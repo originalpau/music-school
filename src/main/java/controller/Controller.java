@@ -35,6 +35,7 @@ public class Controller {
             Instruments instr = dao.findInstrById(instrumentId, true);
             if(instr.getStatus() && (student.getCount() < 2)) {
                 dao.createRental(instrumentId, student.getStudent_id());
+                dao.updateInstrumentStatus(false);
             }
         } catch (Exception e){
             commitOngoingTransaction(failureMsg);
@@ -42,13 +43,12 @@ public class Controller {
         }
     }
 
-    public void terminateRental(Integer instrId, String personNo) throws InstrumentsException {
-        String failureMsg = "Could not terminate rental of " + instrId + " for " + personNo;
+    public void terminateRental(Integer rentalId) throws InstrumentsException {
+        String failureMsg = "Could not terminate rental: " + rentalId;
 
         try {
-            Student student = dao.checkStudentRentals(personNo);
-            dao.updateRental(instrId, student.getStudent_id());
-            dao.updateInstrumentStatus(instrId, true);
+            dao.updateRental(rentalId);
+            dao.updateInstrumentStatus(true);
 
         } catch (Exception e) {
             throw new InstrumentsException(failureMsg, e);
