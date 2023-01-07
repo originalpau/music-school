@@ -70,7 +70,7 @@ VALUES
 
 -- pricing_scheme
 INSERT INTO
-pricing_scheme(lesson_type, level, student_discount_perc, student_price, instructor_price)
+pricing_scheme(type, level, student_discount_perc, student_price, instructor_price)
 VALUES
     ('individual', 'beginner', 0, 150, 100),
     ('individual', 'beginner', 5, 143, 100),

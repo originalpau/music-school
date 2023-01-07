@@ -8,7 +8,6 @@ id SERIAL PRIMARY KEY,
 --lesson_type lesson_type NOT NULL,
 type type NOT NULL,
 level level NOT NULL,
-student_discount_perc SMALLINT NOT NULL,
 student_price SMALLINT NOT NULL,
 instructor_price SMALLINT NOT NULL
 );
@@ -95,6 +94,7 @@ CREATE TABLE lesson (
     level level NOT NULL, 
     start_time TIMESTAMP NOT NULL,
     end_time TIMESTAMP,
+  pricing_scheme_id INT NOT NULL,
     FOREIGN KEY (instructor_id) REFERENCES instructor(id)
 );
 
